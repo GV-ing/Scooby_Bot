@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lidar_gazebo_macro" >
+
+  <!--xacro:include filename="$(find scooby_description)/urdf/utility_macro.xacro" /-->
+
+  <xacro:macro name="lidar_gazebo_sensor" params="parent">
+    <!-- Lidar is composed by a single link and a fixed joint -->
+    <link name="laser_frame">
+      <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="0.1" />
+        <xacro:cylinder_inertia m="0.1" r="0.037" h="0.04" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 ${-M_PI_2}" xyz="0.0 0.0 -0.031" />
+        <geometry>
+          <mesh filename="file://$(find scooby_description)/meshes/lidar.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="White" />
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 -0.031" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.04" radius="0.037" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="laser_joint" type="fixed">
+      <parent link="${parent}" />
+      <child link="laser_frame" />
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.031" />
+    </joint>
+    <!-- Gazebo plugin for the LiDAR sensor -->
+    <gazebo reference="laser_frame">
+      <sensor name="lidar" type="gpu_lidar">
+        <!-- Frame ID for the LiDAR sensor -->
+        <gz_frame_id>laser_frame</gz_frame_id>
+        <pose>0 0 0 0 0 0</pose>
+        <!-- Topic name for the LiDAR data -->
+        <topic>/scan</topic>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>640</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.14159</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.1</min>
+            <max>12.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+      </sensor>
+    </gazebo>
+
+    <!-- Gazebo plugin for the LiDAR sensor -->
+    <gazebo>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    </gazebo>
+  
+  </xacro:macro>
+</robot>
+
