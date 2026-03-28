@@ -7,58 +7,68 @@
   <!-- Odometry root frame -->
   <link name="base_footprint"/>
 
-    <!-- Base properties -->
-    <xacro:property name="base_height" value="0.180" /> 
-    <xacro:property name="base_radius" value="0.11" /> 
+    <!-- Base properties (box: 0.13 x 0.09 x 0.11 m) -->
+    <xacro:property name="base_length" value="0.13" /> <!-- X -->
+    <xacro:property name="base_width" value="0.09" />  <!-- Y -->
+    <xacro:property name="base_height" value="0.11" /> <!-- Z -->
     <xacro:property name="base_mass" value="5" />
+
+    <!-- Wheel properties (cylinder: r=0.03, l=0.04) -->
+    <xacro:property name="wheel_radius" value="0.03" />
+    <xacro:property name="wheel_length" value="0.04" />
     <xacro:property name="wheel_mass" value="2.5" />
-    <xacro:property name="wheel_radius" value="0.035" /> 
-    <xacro:property name="wheel_axle" value="0.13" /> 
+
+    <!-- Wheel separation (distanza tra i centri delle ruote su y) -->
+    <xacro:property name="wheel_separation" value="0.14" />
+    <!-- Wheel longitudinal offset (distanza tra asse centrale e ruote anteriori/posteriori su x) -->
+    <xacro:property name="wheel_x_offset" value="0.075" />
    
 
 
     <link name="base_link">
-      <!-- Inertial properties -->
+      <!-- Inertial properties: parallelepipedo 0.13x0.09x0.11 -->
       <inertial>
         <origin xyz="0 0 0" />
         <mass value="${base_mass}" />
-        <xacro:cylinder_inertia m="${base_mass}" r="${base_radius}" h="${base_height}" />
+        <inertia 
+          ixx="${(1/12.0)*base_mass*(base_width*base_width + base_height*base_height)}"
+          ixy="0.0" ixz="0.0"
+          iyy="${(1/12.0)*base_mass*(base_length*base_length + base_height*base_height)}"
+          iyz="0.0"
+          izz="${(1/12.0)*base_mass*(base_length*base_length + base_width*base_width)}" />
+        <!-- Calcolato per box: ixx = 1/12*m*(y^2+z^2), iyy = 1/12*m*(x^2+z^2), izz = 1/12*m*(x^2+y^2) -->
       </inertial>
-      <!-- Visual representation -->
-      <visual> 
+      <!-- Visual representation: parallelepipedo 13x9x11 cm (inverto x e y) -->
+      <visual>
         <geometry>
-          <mesh filename="file://$(find scooby_description)/meshes/scooby_body.stl" scale="0.001 0.001 0.001" />
+          <box size="${base_length} ${base_width} ${base_height}" />
         </geometry>
         <material name="Blue" />
         <origin xyz="0 0 0" rpy="0 0 0" />
       </visual>
-      <!-- Collision properties -->
+
+
+      <!-- Collision properties: parallelepipedo 0.13x0.09x0.11 -->
       <collision>
         <geometry>
-          <cylinder length="${base_height}" radius="${base_radius}" />
+          <box size="${base_length} ${base_width} ${base_height}" />
         </geometry>
-        <origin xyz="0 0.0 ${(base_height/2.0)-0.05}" rpy="0 0 0" />
-      </collision> 
-      <collision>
-        <geometry>
-          <sphere radius="0.019" />
-        </geometry>
-        <origin xyz="-0.0825 0.0 -0.04" rpy="0 0 0" />
-      </collision>       
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </collision>
     </link>
 
-    <!-- Left Wheel -->
-    <link name="left_wheel_link">
-      <visual> 
+    <!-- Motrice: Anteriore Sinistra -->
+    <link name="left_wheel_link_f">
+      <visual>
         <geometry>
-          <mesh filename="file://$(find scooby_description)/meshes/scooby_wheel.stl" scale="0.001 0.001 0.001" />
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
         </geometry>
         <material name="Black" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
       </visual>
       <collision>
         <geometry>
-          <cylinder length="0.02" radius="${wheel_radius}" />
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
         </geometry>
         <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
       </collision>
@@ -68,19 +78,60 @@
         <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
       </inertial>
     </link>
-
-    <!-- Right Wheel -->
-    <link name="right_wheel_link">
-      <visual> 
+    <!-- Passiva: Posteriore Sinistra -->
+    <link name="left_wheel_link_b">
+      <visual>
         <geometry>
-          <mesh filename="file://$(find scooby_description)/meshes/scooby_wheel.stl" scale="0.001 0.001 0.001" />
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
         </geometry>
-        <material name="Black"/>
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <material name="Black" />
+        <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
       </visual>
       <collision>
         <geometry>
-          <cylinder length="0.02" radius="${wheel_radius}" />
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="${wheel_mass}" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
+      </inertial>
+    </link>
+    <!-- Passiva: Anteriore Destra -->
+    <link name="right_wheel_link_f">
+      <visual>
+        <geometry>
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+        </geometry>
+        <material name="Black" />
+        <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="${wheel_mass}" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
+      </inertial>
+    </link>
+    <!-- Motrice: Posteriore Destra -->
+    <link name="right_wheel_link_b">
+      <visual>
+        <geometry>
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+        </geometry>
+        <material name="Black" />
+        <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${wheel_length}" radius="${wheel_radius}" />
         </geometry>
         <origin xyz="0 0 0" rpy="0 1.5708 1.5708" />
       </collision>
@@ -102,18 +153,38 @@
       <child link="base_link" />
       <origin xyz="0.0 0.0 0.059" rpy="0 0 0" />
     </joint>
-    <joint name="left_wheel_joint" type="continuous">
+    <!-- Motrice: Anteriore Sinistra -->
+    <joint name="left_wheel_joint_f" type="continuous">
       <parent link="base_link" />
-      <child link="left_wheel_link" />
-      <origin xyz="0.04025 0.062 -0.024" rpy="0 0 0" />
+      <child link="left_wheel_link_f" />
+      <origin xyz="${wheel_x_offset} ${wheel_separation/2.0} -0.024" rpy="0 0 0" />
       <axis xyz="0 1 0" />
       <limit effort="100" velocity="100" />
       <dynamics damping="0.5" friction="0.01" />
     </joint>
-    <joint name="right_wheel_joint" type="continuous">
+    <!-- Motrice: Posteriore Destra -->
+    <joint name="right_wheel_joint_b" type="continuous">
       <parent link="base_link" />
-      <child link="right_wheel_link" />
-      <origin xyz="0.04025 -0.062 -0.024" rpy="0 0 ${-M_PI}" />
+      <child link="right_wheel_link_b" />
+      <origin xyz="-${wheel_x_offset} -${wheel_separation/2.0} -0.024" rpy="0 0 ${-M_PI}" />
+      <axis xyz="0 -1 0" />
+      <limit effort="100" velocity="100" />
+      <dynamics damping="0.5" friction="0.01" />
+    </joint>
+    <!-- Passiva: Posteriore Sinistra -->
+    <joint name="left_wheel_joint_b" type="continuous">
+      <parent link="base_link" />
+      <child link="left_wheel_link_b" />
+      <origin xyz="-${wheel_x_offset} ${wheel_separation/2.0} -0.024" rpy="0 0 0" />
+      <axis xyz="0 1 0" />
+      <limit effort="100" velocity="100" />
+      <dynamics damping="0.5" friction="0.01" />
+    </joint>
+    <!-- Passiva: Anteriore Destra -->
+    <joint name="right_wheel_joint_f" type="continuous">
+      <parent link="base_link" />
+      <child link="right_wheel_link_f" />
+      <origin xyz="${wheel_x_offset} -${wheel_separation/2.0} -0.024" rpy="0 0 ${-M_PI}" />
       <axis xyz="0 -1 0" />
       <limit effort="100" velocity="100" />
       <dynamics damping="0.5" friction="0.01" />
@@ -130,18 +201,18 @@
     </joint>
 
     <!-- Transmissions for the wheel joints -->
-    <transmission name="left_wheel_joint_trans">
+    <transmission name="left_wheel_joint_f_trans">
       <type>transmission_interface/SimpleTransmission</type>
-      <joint name="left_wheel_joint" />
-      <actuator name="left_wheel_joint_motor">
+      <joint name="left_wheel_joint_f" />
+      <actuator name="left_wheel_joint_f_motor">
         <mechanicalReduction>1</mechanicalReduction>
         <hardwareInterface>EffortJointInterface</hardwareInterface>
       </actuator>
     </transmission>
-    <transmission name="right_wheel_joint_trans">
+    <transmission name="right_wheel_joint_b_trans">
       <type>transmission_interface/SimpleTransmission</type>
-      <joint name="right_wheel_joint" />
-      <actuator name="right_wheel_joint_motor">
+      <joint name="right_wheel_joint_b" />
+      <actuator name="right_wheel_joint_b_motor">
         <mechanicalReduction>1</mechanicalReduction>
         <hardwareInterface>EffortJointInterface</hardwareInterface>
       </actuator>
@@ -149,12 +220,13 @@
 
     <!-- Plugin for differential drive control in Gazebo-->
     <gazebo>
+      <!-- Plugin per 4 ruote: puoi sostituire con un plugin custom se necessario -->
       <plugin
         filename="libgz-sim-diff-drive-system.so"
         name="gz::sim::systems::DiffDrive">
-        <left_joint>left_wheel_joint</left_joint>
-        <right_joint>right_wheel_joint</right_joint>
-        <wheel_separation>${wheel_axle}</wheel_separation>
+        <left_joint>left_wheel_joint_f</left_joint>
+        <right_joint>right_wheel_joint_b</right_joint>
+        <wheel_separation>${wheel_separation}</wheel_separation>
         <wheel_radius>${wheel_radius}</wheel_radius>
         <!-- Limits for the differential drive -->
         <max_linear_acceleration>1.0</max_linear_acceleration>
@@ -184,9 +256,10 @@
         filename="libgz-sim-joint-state-publisher-system.so"
         name="gz::sim::systems::JointStatePublisher">
         <topic>/joint_states</topic>
-        <joint_name>left_wheel_joint</joint_name>
-
-        <joint_name>right_wheel_joint</joint_name>
+        <joint_name>left_wheel_joint_f</joint_name>
+        <joint_name>right_wheel_joint_b</joint_name>
+        <joint_name>left_wheel_joint_b</joint_name>
+        <joint_name>right_wheel_joint_f</joint_name>
       </plugin>
     </gazebo>
 
