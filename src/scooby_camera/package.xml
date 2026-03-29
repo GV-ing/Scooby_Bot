@@ -1,0 +1,12 @@
+<package format="3">
+  <name>scooby_camera</name>
+  <version>0.0.1</version>
+  <description>ROS2 package to publish Raspberry Pi camera images for Scooby Bot.</description>
+  <maintainer email="your.email@example.com">Your Name</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>opencv-python</exec_depend>
+</package>
