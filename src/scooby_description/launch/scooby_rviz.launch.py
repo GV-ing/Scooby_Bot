@@ -18,6 +18,7 @@ def generate_launch_description():
     # RViz configuration file path
     rviz_config_file = os.path.join(pkg_share, 'conf', 'scooby_conf_ros2.rviz')
 
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')  
     # Robot description from xacro
     robot_description = ParameterValue(
         Command(['xacro ', xacro_file]),
@@ -31,7 +32,7 @@ def generate_launch_description():
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output='screen',
-        parameters=[{'robot_description': robot_description}]
+        parameters=[{'robot_description': robot_description, 'use_sim_time': use_sim_time}]
     )
 
     # Joint State Publisher node,
@@ -40,7 +41,8 @@ def generate_launch_description():
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher',
-        output='screen'
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}] 
     )
 
     # RViz node
@@ -49,8 +51,9 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output='screen',
-        arguments=['-d', rviz_config_file]
-    )
+        arguments=['-d', rviz_config_file],     
+        parameters=[{'use_sim_time': use_sim_time}]
+    )   
 
     #Joistick teleoperation node
     # not necessary since we already lounch it in 
@@ -60,7 +63,6 @@ def generate_launch_description():
         executable='joy_to_cmdvel',
         name='joy_to_cmdvel',
         output='screen',
-        remappings=[('/cmd_vel', '/scooby/cmd_vel')]
     )
     #Reading joystick inputs Node
     # not necessary since we already lounch it in 
@@ -74,9 +76,9 @@ def generate_launch_description():
 
 
     return LaunchDescription([
-        #robot_state_publisher_node,
-        #joint_state_publisher_node,
-        #telop_node,
-        #joy_node,
+        robot_state_publisher_node,
+        joint_state_publisher_node,
+        telop_node,
+        joy_node,
         rviz_node
     ])
