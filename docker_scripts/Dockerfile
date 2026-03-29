@@ -36,9 +36,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-joint-state-publisher \
     ros-humble-joy \
     ros-humble-teleop-twist-joy \
+    ros-humble-cv-bridge \
+    python3-opencv \
     && rm -rf /var/lib/apt/lists/*
 
 # Configurazione Entrypoint per il sourcing automatico
+RUN pip3 install --no-cache-dir opencv-python
 RUN echo '#!/bin/bash' > /entrypoint.sh && \
     echo 'source /opt/ros/humble/setup.bash' >> /entrypoint.sh && \
     echo 'if [ -f "/root/scooby_real_ws/install/setup.bash" ]; then source /root/scooby_real_ws/install/setup.bash; fi' >> /entrypoint.sh && \
