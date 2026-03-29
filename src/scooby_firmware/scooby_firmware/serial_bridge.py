@@ -2,27 +2,28 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import serial
-import time
+MAX_PWM = 200
+
 
 class SerialBridge(Node):
     def __init__(self):
         super().__init__('serial_bridge')
-        
-        # Parametri configurabili
-        self.declare_parameter('port', '/dev/ttyACM0')
+        self.declare_parameter('port', '/dev/ttyUSB0')
         self.declare_parameter('baudrate', 115200)
-        self.declare_parameter('wheel_separation', 0.2) # Metri (adattare al robot reale)
+        self.declare_parameter('wheel_separation', 0.2)  # metri
+        self.declare_parameter('max_speed', 1.0)  # m/s
 
         port = self.get_parameter('port').value
         baud = self.get_parameter('baudrate').value
         self.wheel_sep = self.get_parameter('wheel_separation').value
+        self.max_speed = self.get_parameter('max_speed').value
 
         try:
             self.ser = serial.Serial(port, baud, timeout=0.1)
-            self.get_logger().info(f"Connesso ad Arduino su {port} @ {baud}")
+            self.get_logger().info(f"Connesso a {port} @ {baud}")
         except Exception as e:
-            self.get_logger().error(f"Errore connessione seriale: {e}")
-            exit(1)
+            self.get_logger().error(f"Errore apertura seriale: {e}")
+            self.ser = None
 
         self.subscription = self.create_subscription(
             Twist,
@@ -31,22 +32,20 @@ class SerialBridge(Node):
             10)
 
     def cmd_vel_callback(self, msg):
-        # Cinematica differenziale: v = (vr + vl) / 2, w = (vr - vl) / L
+        if not self.ser or not self.ser.is_open:
+            self.get_logger().error("Seriale non disponibile!")
+            return
         v = msg.linear.x
         w = msg.angular.z
-
-        # Calcolo velocità ruote (m/s)
-        vel_l = v - (w * self.wheel_sep / 2.0)
-        vel_r = v + (w * self.wheel_sep / 2.0)
-
-        # Mappatura su range PWM (es: -255 a 255)
-        # Assumiamo una velocità max di 1.0 m/s -> 255 PWM
-        pwm_l = int(max(min(vel_l * 255, 255), -255))
-        pwm_r = int(max(min(vel_r * 255, 255), -255))
-
-        # Formato stringa: "L<valore>;R<valore>\n"
+        # Cinematica differenziale: v = (vr + vl)/2, w = (vr - vl)/L
+        # Ricavo vr e vl
+        vr = v + (3*w * self.wheel_sep)
+        vl = v - (3*w * self.wheel_sep)
+        # Mappatura PWM [-255, 255] rispetto a max_speed
+        pwm_r = -int(max(min(vr / self.max_speed * MAX_PWM, MAX_PWM), -MAX_PWM))
+        pwm_l = -int(max(min(vl / self.max_speed * MAX_PWM, MAX_PWM), -MAX_PWM))
         command = f"L{pwm_l};R{pwm_r}\n"
-        
+        self.get_logger().info(f"Comando seriale inviato: {command.strip()}")
         try:
             self.ser.write(command.encode('utf-8'))
         except Exception as e:
