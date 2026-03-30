@@ -1,0 +1,14 @@
+[Unit]
+Description=Avvio automatico Scooby-Bot
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=scobybot
+WorkingDirectory=/home/scobybot/Scooby_Bot/docker_scripts
+ExecStart=/bin/bash -l -c '/home/scobybot/Scooby_Bot/docker_scripts/startup_scooby.sh > /home/scobybot/Scooby_Bot/docker_scripts/startup_scooby.log 2>&1'
+Environment="HOME=/home/scobybot"
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

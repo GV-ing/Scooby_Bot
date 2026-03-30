@@ -10,11 +10,7 @@ find_package(ament_cmake REQUIRED)
 # Install the necessary folders 
 install(DIRECTORY
   urdf
-  meshes
   launch
-  conf
-  meshes
-  models
   worlds
   DESTINATION share/${PROJECT_NAME}
 )
@@ -26,8 +22,3 @@ endif()
 
 #Install the joy_to_cmdvel script
 ament_package()
-install(
-  PROGRAMS src/joy_to_cmdvel.py
-  DESTINATION lib/${PROJECT_NAME}
-  RENAME joy_to_cmdvel
-)

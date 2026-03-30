@@ -39,11 +39,11 @@ class SerialBridge(Node):
         w = msg.angular.z
         # Cinematica differenziale: v = (vr + vl)/2, w = (vr - vl)/L
         # Ricavo vr e vl
-        vr = v + (3*w * self.wheel_sep)
-        vl = v - (3*w * self.wheel_sep)
+        vr = v - (3*w * self.wheel_sep)
+        vl = v + (3*w * self.wheel_sep)
         # Mappatura PWM [-255, 255] rispetto a max_speed
-        pwm_r = -int(max(min(vr / self.max_speed * MAX_PWM, MAX_PWM), -MAX_PWM))
-        pwm_l = -int(max(min(vl / self.max_speed * MAX_PWM, MAX_PWM), -MAX_PWM))
+        pwm_r = int(max(min(vr / self.max_speed * MAX_PWM, MAX_PWM), -MAX_PWM))
+        pwm_l = int(max(min(vl / self.max_speed * MAX_PWM, MAX_PWM), -MAX_PWM))
         command = f"L{pwm_l};R{pwm_r}\n"
         self.get_logger().info(f"Comando seriale inviato: {command.strip()}")
         try:

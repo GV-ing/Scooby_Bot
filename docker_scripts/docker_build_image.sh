@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 cd "$(dirname "$0")"
 
 # Start the Docker image build

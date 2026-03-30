@@ -5,8 +5,20 @@ IMAGE_NAME="scooby_real_image"
 IMAGE_ID=$(docker images -q "$IMAGE_NAME")
 CNT_NAME="scooby_real_cnt"
 
-# Start the container with options required to run ROS2 and Gazebo with GUI
-xhost +local:root
+# xhost è opzionale, serve solo per GUI/X11
+if command -v xhost &> /dev/null; then
+	xhost +local:root
+	XHOST_USED=1
+else
+	XHOST_USED=0
+fi
+
+# Mount automatico di tutti i device video*
+VIDEO_DEVICES=""
+for dev in /dev/video*; do
+	[ -e "$dev" ] && VIDEO_DEVICES="$VIDEO_DEVICES --device=$dev:$dev"
+done
+
 docker run --rm -it --net=host \
 	--env="DISPLAY=$DISPLAY" \
 	--env="QT_X11_NO_MITSHM=1" \
@@ -15,10 +27,13 @@ docker run --rm -it --net=host \
 	--volume="$THISDIR/../src:/root/ros2_ws/src:rw" \
 	--device=/dev/dri:/dev/dri \
 	--privileged \
+	${VIDEO_DEVICES} \
 	"${DOCKER_VOLUMES_ARGS[@]}" \
 	--name="$CNT_NAME" \
 	--workdir "/root/ros2_ws" \
 	"$IMAGE_NAME" \
 	bash
 
-xhost -local:root
+if [ "$XHOST_USED" = "1" ]; then
+	xhost -local:root
+fi
