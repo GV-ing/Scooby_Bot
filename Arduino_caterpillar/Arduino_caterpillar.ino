@@ -9,19 +9,14 @@
 #define MR_Ctrl 2
 #define MR_PWM 5
 
-// Definizione Pin Shield Motori (Configurazione standard Keyestudio/L298P)
-const int M1 = 4; // Direzione Motore A (Sinistro) - ML_Ctrl
-const int E1 = 6; // PWM Motore A (Sinistro)      - ML_PWM
-const int M2 = 2; // Direzione Motore B (Destro)  - MR_Ctrl
-const int E2 = 5; // PWM Motore B (Destro)        - MR_PWM
 
 void setup() {
   Serial.begin(115200);
   
-  pinMode(M1, OUTPUT);
-  pinMode(M2, OUTPUT);
-  pinMode(E1, OUTPUT);
-  pinMode(E2, OUTPUT);
+  pinMode(ML_Ctrl, OUTPUT);
+  pinMode(MR_Ctrl, OUTPUT);
+  pinMode(ML_PWM, OUTPUT);
+  pinMode(MR_PWM, OUTPUT);
 
   // Stop motori all'avvio
   stopMotors();
@@ -31,7 +26,7 @@ void loop() {
   if (Serial.available() > 0) {
     String input = Serial.readStringUntil('\n');
     parseAndDrive(input);
-    delay(5);
+    delay(1);
   }
 }
 
@@ -81,6 +76,6 @@ void controlMotors(float leftSpeed, float rightSpeed) {
 }
 
 void stopMotors() {
-  analogWrite(E1, 0);
-  analogWrite(E2, 0);
+  analogWrite(ML_PWM, 0);
+  analogWrite(MR_PWM, 0);
 }

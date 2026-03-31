@@ -12,8 +12,8 @@ setup(
     ],
     install_requires=['setuptools', 'pyserial'],
     zip_safe=True,
-    maintainer='Your Name',
-    maintainer_email='your@email.com',
+    maintainer='Giulio Vestri',
+    maintainer_email='g.vestri2904@gmail.com',
     description='Bridge seriale per il controllo motori di Scooby-Bot via Arduino',
     license='Apache License 2.0',
     entry_points={

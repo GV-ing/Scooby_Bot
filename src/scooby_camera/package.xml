@@ -1,14 +1,18 @@
+<?xml version="1.0"?>
 <package format="3">
   <name>scooby_camera</name>
-  <version>0.0.1</version>
-  <description>ROS2 package to publish Raspberry Pi camera images for Scooby Bot.</description>
-  <maintainer email="your.email@example.com">Your Name</maintainer>
-  <license>MIT</license>
+  <version>0.1.0</version>
+  <description>ROS2 package to publish Raspberry Pi camera images for Scooby Bot</description>
+  <maintainer email="g.vestri2904@gmail.com">Giulio Vestri</maintainer>
+  <license>Apache License 2.0</license>
   <buildtool_depend>ament_python</buildtool_depend>
-  <depend>rclpy</depend>
-  <depend>sensor_msgs</depend>
+
   <exec_depend>cv_bridge</exec_depend>
-  <exec_depend>opencv-python</exec_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
 </package>

@@ -3,7 +3,7 @@
   <name>scooby_firmware</name>
   <version>0.1.0</version>
   <description>Bridge seriale per il controllo motori di Scooby-Bot via Arduino</description>
-  <maintainer email="your@email.com">Your Name</maintainer>
+  <maintainer email="g.vestri2904@gmail.com">Giulio Vestri</maintainer>
   <license>Apache License 2.0</license>
   <depend>rclpy</depend>
   <depend>geometry_msgs</depend>

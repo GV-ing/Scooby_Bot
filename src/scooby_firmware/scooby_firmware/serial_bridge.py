@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import serial
-MAX_PWM = 200
+MAX_PWM = 175
 
 
 class SerialBridge(Node):
