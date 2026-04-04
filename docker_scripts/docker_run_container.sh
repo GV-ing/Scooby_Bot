@@ -26,6 +26,7 @@ docker run --rm -it --net=host \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 	--volume="$THISDIR/../src:/root/ros2_ws/src:rw" \
 	--device=/dev/dri:/dev/dri \
+	--device=/dev/ttyAMA0:/dev/ttyAMA0 \
 	--privileged \
 	${VIDEO_DEVICES} \
 	"${DOCKER_VOLUMES_ARGS[@]}" \

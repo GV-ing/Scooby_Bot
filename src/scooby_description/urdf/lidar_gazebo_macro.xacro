@@ -3,7 +3,7 @@
 
   <!--xacro:include filename="$(find scooby_description)/urdf/utility_macro.xacro" /-->
 
-  <xacro:macro name="lidar_gazebo_sensor" params="parent">
+  <xacro:macro name="lidar_gazebo_sensor" params="name:=lidar parent *origin">
     <!-- Lidar is composed by a single link and a fixed joint -->
     <link name="laser_frame">
       <inertial>
@@ -29,7 +29,7 @@
     <joint name="laser_joint" type="fixed">
       <parent link="${parent}" />
       <child link="laser_frame" />
-      <origin rpy="0 0 0" xyz="0.0 0.0 0.031" />
+      <xacro:insert_block name="origin" />
     </joint>
     <!-- Gazebo plugin for the LiDAR sensor -->
     <gazebo reference="laser_frame">

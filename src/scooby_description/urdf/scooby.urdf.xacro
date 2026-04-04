@@ -3,25 +3,29 @@
  including its base, LIDAR, and RGBD sensors.-->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="scooby" >
   <xacro:include filename="$(find scooby_description)/urdf/scooby_base_macro.xacro"/>
-  <!--xacro:include filename="$(find scooby_description)/urdf/lidar_gazebo_macro.xacro"/> 
-  <xacro:include filename="$(find scooby_description)/urdf/d435_gazebo_macro.xacro" /> 
+  <xacro:include filename="$(find scooby_description)/urdf/lidar_gazebo_macro.xacro"/> 
+  <xacro:include filename="$(find scooby_description)/urdf/camera.xacro" /> 
   
+  
+  <xacro:property name="CAMERA" value="True"/>
   <xacro:property name="LIDAR" value="True"/>
-  <xacro:property name="DEPTH" value="True"/>
-  -->
+  
+  
+  
   <!-- Diff Drive Robot Base -->
   <xacro:scooby_base/>
+ 
+  <!-- LIDAR Sensor -->
+  <xacro:if value="${LIDAR}">
+    <xacro:lidar_gazebo_sensor name="lidar_gazebo_macro" parent="lidar_link">
+      <origin xyz="0.0 0.0 0.031" rpy="0 0 0" />
+    </xacro:lidar_gazebo_sensor>
+  </xacro:if>
 
-  <!-- LIDAR Sensor--> 
-  <!--xacro:if value="${LIDAR}">
-    <xacro:lidar_gazebo_sensor parent="lidar_link"/>
-  </xacro:if-->
-
-  <!-- RGBD Sensor (D435 Camera) -->
-
-  <!--xacro:if value="${DEPTH}">
-    <xacro:d435_gazebo_sensor parent="d435_link" />
-  </xacro:if-->
-  
+  <xacro:if value="${CAMERA}">
+    <xacro:scooby_rgbd_camera name="camera" parent="d435_link">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:scooby_rgbd_camera>
+  </xacro:if>
 
 </robot>
