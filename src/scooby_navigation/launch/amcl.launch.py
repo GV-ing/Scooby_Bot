@@ -28,7 +28,8 @@ def generate_launch_description():
             ),
             launch_arguments={
                 'use_sim_time': use_sim_time,
-                'params_file': nav2_params_path
+                'params_file': nav2_params_path,
+                'map': map_path,
             }.items()
         )
     
